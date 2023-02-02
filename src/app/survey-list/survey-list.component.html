@@ -1,0 +1,72 @@
+<h2>アンケート一覧</h2>
+<clr-datagrid>
+    <clr-dg-column>ID</clr-dg-column>
+    <clr-dg-column>タイトル</clr-dg-column>
+    <clr-dg-column>質問</clr-dg-column>
+    <clr-dg-column>作成日時</clr-dg-column>
+    <clr-dg-column>アクション</clr-dg-column>
+    <clr-dg-row *clrDgItems="let survey of surveys" [clrDgItem]="survey">
+        <clr-dg-cell>{{survey.id}}</clr-dg-cell>
+        <clr-dg-cell>{{survey.title}}</clr-dg-cell>
+        <clr-dg-cell>{{survey.question}}</clr-dg-cell>
+        <clr-dg-cell>{{survey.created | date}}</clr-dg-cell>
+        <clr-dg-cell>
+            <div class="btn-group btn-primary">
+                <a [routerLink]="['/survey/', survey.id]" class="btn">回答</a>
+                <button class="btn btn-success" (click)="onSelect(survey)">編集</button>
+                <button class="btn btn-danger" (click)="deleteSurveyAlert(survey)">削除</button>
+            </div>
+        </clr-dg-cell>
+    </clr-dg-row>
+    <clr-dg-footer>
+        <clr-dg-pagination #pagination [clrDgPageSize]=5>
+            <clr-dg-page-size #clrDgPageSize [clrPageSizeOptions]="[5,10,20,50,100]">
+                <label [for]="clrDgPageSize.pageSizeOptionsId">surveys per page</label>
+            </clr-dg-page-size>
+            {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+            of {{pagination.totalItems}} surveys
+        </clr-dg-pagination>
+    </clr-dg-footer>>
+</clr-datagrid>
+<button class="btn" (click)="onAddSurvey()">アンケート追加</button>
+
+<app-survey-edit [survey]="selectedSurveyEdit" [surveyItems]="selectedSurveyItems"
+    (reloadSurveys)="getSurveys()"></app-survey-edit>
+<app-survey-add [test]="selectedSurveyEdit" [addModalOpen]="addSurveyFlag"
+    (reloadSurveys)="getSurveys()"></app-survey-add>
+
+<div *ngIf="deleteTargetSurvey">
+    <div class="modal static bump-down">
+        <div class="modal-dialog" role="dialog" aria-hidden="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-label="Close" class="close" type="button" (click)="deleteModalClose()">
+                        <cds-icon aria-hidden="true" shape="close"></cds-icon>
+                    </button>
+                    <h3 class="modal-title">アンケート削除</h3>
+                </div>
+                <div class="alert alert-danger" role="alert">
+                    <div class="alert-items">
+                        <div class="alert-item static">
+                            <div class="alert-icon-wrapper">
+                                <cds-icon class="alert-icon" shape="exclamation-circle"></cds-icon>
+                            </div>
+                            <span class="alert-text">
+                                タイトル：{{deleteTargetSurvey.title}}を削除します
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <p>削除しても回答は残ります</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" type="button" (click)="deleteModalClose()">Cancel</button>
+                    <button class="btn btn-primary" type="button"
+                        (click)="deleteSurvey(deleteTargetSurvey.id)">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop" aria-hidden="true"></div>
+</div>

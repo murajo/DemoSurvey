@@ -1,0 +1,42 @@
+<div *ngIf="addModalOpen">
+    <div class="modal">
+        <div class="modal-dialog" role="dialog" aria-hidden="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-label="Close" class="close" type="button" (click)="onClose()">
+                        <cds-icon shape="close"></cds-icon>
+                    </button>
+                    <h3 class="modal-title">新規アンケート</h3>
+                </div>
+                <div class="modal-body">
+                    <form clrForm style="width: 150%;">
+                        <clr-input-container>
+                            <label style="font-size:110%;">タイトル</label>
+                            <input clrInput type="text" [(ngModel)]="survey.title" placeholder="" required minlength="1"
+                                name="title">
+                            <clr-control-error>入力必須</clr-control-error>
+                        </clr-input-container>
+                        <clr-textarea-container>
+                            <label style="font-size:110%;">質問文</label>
+                            <textarea clrTextarea [(ngModel)]="survey.question" required name="question"></textarea>
+                            <clr-control-error>入力必須</clr-control-error>
+                        </clr-textarea-container>
+                        <clr-input-container *ngFor="let surveyItem of surveyItems;let i = index">
+                            <label style="font-size:110%;">選択肢{{i+1}}
+                                <cds-icon shape="trash" style="color:red;" (click)="deleteSurveyItemList(i)"></cds-icon>
+                            </label>
+                            <input clrInput type="text" [(ngModel)]="surveyItem.text" required name="surveyItem{{i+1}}">
+                            <clr-control-error>入力必須</clr-control-error>
+                        </clr-input-container>
+                    </form>
+                        <cds-icon shape="clone" size="md" style="color:royalblue;" (click)="addSurveyItemInitialize()"></cds-icon>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" type="button" (click)="onClose()">Cancel</button>
+                    <button [clrLoading]="submitBtnState" class="btn btn-primary" (click)="editFixSurvey()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop" aria-hidden="true"></div>
+</div>
