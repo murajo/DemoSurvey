@@ -1,10 +1,10 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { ClrLoadingState } from '@clr/angular';
-import { Survey } from '../interface/survey';
+import { Survey } from '../class/survey';
 import { SurveyService } from '../service/survey.service';
-import { SurveyItem, SurveyItemInitialize } from '../interface/survey-item';
+import { SurveyItem } from '../class/survey-item';
 import { SurveyItemService } from '../service/survey-item.service';
-import { forkJoin, Observable, of } from 'rxjs';
+import { combineLatest, forkJoin, Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-survey-edit',
@@ -26,7 +26,7 @@ export class SurveyEditComponent {
 
   onClose(): void {
     this.survey = undefined;
-    this.surveyItems = undefined;
+    this.surveyItems = [];
     this.deleteSurveyItems = [];
     this.reloadSurveys.emit();
   }
@@ -37,13 +37,16 @@ export class SurveyEditComponent {
     requests.push(this.updateSurveyItem());
     requests.push(this.deleteSurveyItem());
     requests.push(this.addSurveyItem());
-    const execRequest$ = forkJoin(requests);
 
-    execRequest$.subscribe(() => {
+    combineLatest(requests).subscribe(() => {
       this.submitBtnState = ClrLoadingState.SUCCESS;
       this.submitBtnState = ClrLoadingState.DEFAULT;
       this.onClose();
-    });
+    }, (errors) => {
+      this.submitBtnState = ClrLoadingState.ERROR;
+      console.error(errors);
+    }
+    );
   }
 
   updateSurvey(): Observable<any> {
@@ -75,7 +78,7 @@ export class SurveyEditComponent {
 
   addSurveyItemInitialize() {
     if (!this.surveyItems) return;
-    this.surveyItems.push(new SurveyItemInitialize);
+    this.surveyItems.push(new SurveyItem);
   }
 
   deleteSurveyItemList(index: number) {

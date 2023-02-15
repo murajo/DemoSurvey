@@ -1,12 +1,4 @@
-export interface Answer {
-    id: number;
-    surveyId: number;
-    surveyItemId: number;
-    created: string;
-    updated: string;
-}
-
-export class AnswerInitialize {
+export class Answer {
     id: number;
     surveyId: number;
     surveyItemId: number;

@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
-import { Survey } from '../interface/survey';
+
+import { Survey } from '../class/survey';
+import { SurveyItem } from '../class/survey-item';
 import { SurveyService } from '../service/survey.service';
 import { SurveyItemService } from '../service/survey-item.service';
-import { SurveyItem } from '../interface/survey-item';
+
 
 @Component({
   selector: 'app-survey-list',
@@ -11,10 +13,11 @@ import { SurveyItem } from '../interface/survey-item';
 })
 export class SurveyListComponent {
   surveys: Survey[] = [];
-  selectedSurveyItems: SurveyItem[] = [];
-  selectedSurveyEdit?: Survey;
-  addSurveyFlag?: Boolean;
-  deleteTargetSurvey?: Survey;
+  addSurveyModal?: Boolean;
+  selectedUpdateSurvey?: Survey;
+  selectedDeleteSurvey?: Survey;
+  selectedSurveyItems?: SurveyItem[];
+
   constructor(
     private surveyService: SurveyService,
     private surveyItemService: SurveyItemService
@@ -27,7 +30,20 @@ export class SurveyListComponent {
   getSurveys() {
     this.surveyService.getSurveys()
       .subscribe(surveys => this.surveys = surveys);
-    this.addSurveyFlag = false;
+  }
+
+  endModal() {
+    this.addSurveyModal = false;
+    this.getSurveys();
+  }
+
+  onAddSurvey() {
+    this.addSurveyModal = true;
+  }
+
+  onEditSurvey(survey: Survey) {
+    this.selectedUpdateSurvey = survey;
+    this.getSurveyItemsBySurveyId(survey.id);
   }
 
   getSurveyItemsBySurveyId(surveyId: number) {
@@ -36,30 +52,7 @@ export class SurveyListComponent {
         this.selectedSurveyItems = surveyItems;
       });
   }
-
-  deleteSurvey(surveyId: number) {
-    this.surveyService.deleteSurvey(surveyId)
-      .subscribe(err => {
-        this.getSurveys();
-        this.deleteTargetSurvey = undefined;
-      });
+  onDeleteSurvey(survey: Survey) {
+    this.selectedDeleteSurvey = survey;
   }
-
-  onSelect(survey: Survey) {
-    this.selectedSurveyEdit = survey;
-    this.getSurveyItemsBySurveyId(survey.id);
-  }
-
-  onAddSurvey() {
-    this.addSurveyFlag = true;
-  }
-
-  deleteSurveyAlert(survey: Survey) {
-    this.deleteTargetSurvey = survey;
-  }
-
-  deleteModalClose() {
-    this.deleteTargetSurvey = undefined;
-  }
-
 }

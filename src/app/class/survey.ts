@@ -1,12 +1,4 @@
-export interface Survey {
-    id: number;
-    title: string;
-    question: string;
-    created: string;
-    updated: string;
-}
-
-export class SurveyInitialize {
+export class Survey {
     id: number;
     title: string;
     question: string;

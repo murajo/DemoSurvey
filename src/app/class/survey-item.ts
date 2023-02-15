@@ -1,12 +1,4 @@
-export interface SurveyItem {
-    id: number;
-    text: string;
-    surveyId: number;
-    created: string;
-    updated: string;
-}
-
-export class SurveyItemInitialize {
+export class SurveyItem {
     id: number;
     text: string;
     surveyId: number;

@@ -1,13 +1,16 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Survey } from '../interface/survey';
-import { ChartTemplate } from '../interface/chart';
+import { Observable } from 'rxjs';
+
+import { Survey } from '../class/survey';
+import { SurveyItem } from '../class/survey-item';
+import { Answer } from '../class/answer';
+import { ChartTemplate } from '../class/chart';
+
 import { SurveyService } from '../service/survey.service';
 import { SurveyItemService } from '../service/survey-item.service';
 import { AnswerService } from '../service/answer.service';
-import { SurveyItem } from '../interface/survey-item';
-import { Answer, AnswerInitialize } from '../interface/answer';
-import { forkJoin, Observable, of } from 'rxjs';
+
 import { ChartDataset } from "chart.js";
 
 @Component({
@@ -17,10 +20,12 @@ import { ChartDataset } from "chart.js";
 })
 export class SurveyAnswerComponent {
 
-  survey?: Survey[];
+  survey?: Survey;
   surveyItems?: SurveyItem[];
   answers?: Answer[];
   answerChart = new ChartTemplate();
+  surveyId = Number(this.route.snapshot.paramMap.get('id'))
+
   constructor(
     private surveyService: SurveyService,
     private surveyItemService: SurveyItemService,
@@ -29,12 +34,11 @@ export class SurveyAnswerComponent {
   ) { }
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.getSurveyById(id).subscribe(survey => { this.survey = survey });;
-    this.getSurveyItemsBySurveyId(id).subscribe(surveyItems => { this.surveyItems = surveyItems });;
-    this.getAnswerBySurveyId(id).subscribe(answers => {
-      this.answers = answers
-      this.createAnswerChart();
+    this.getSurveyById(this.surveyId).subscribe(survey => { this.survey = survey });
+    this.getSurveyItemsBySurveyId(this.surveyId).subscribe(surveyItems => { this.surveyItems = surveyItems });
+    this.getAnswerBySurveyId(this.surveyId).subscribe(answers => {
+      this.answers = answers;
+      this.initChartDataset();
     });
   }
 
@@ -51,9 +55,11 @@ export class SurveyAnswerComponent {
   }
 
   selectAnswer(surveyItemId: number) {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.addAnswer(this.addAnswerInitialize(surveyItemId)).subscribe(() => {
-      this.getAnswerBySurveyId(id).subscribe(answers => {
+    const answer = new Answer;
+    answer.surveyId = this.surveyId;
+    answer.surveyItemId = surveyItemId;
+    this.addAnswer(answer).subscribe(() => {
+      this.getAnswerBySurveyId(this.surveyId).subscribe(answers => {
         this.answers = answers
         this.updateChartDataset();
       })
@@ -61,31 +67,18 @@ export class SurveyAnswerComponent {
   }
 
   addAnswer(answer: Answer): Observable<any> {
-    return this.survey ?
-      this.answerService.addAnswer(answer) : of(null);
+    return this.answerService.addAnswer(answer);
   }
 
-  addAnswerInitialize(surveyItemId: number) {
-    const answer = new AnswerInitialize;
-    answer.surveyId = Number(this.route.snapshot.paramMap.get('id'));
-    answer.surveyItemId = surveyItemId;
-    return answer;
-  }
-
-  createAnswerChart() {
+  initChartDataset() {
     if (!this.surveyItems) return;
     this.answerChart.chartType = "pie";
     this.answerChart.chartOptions = { responsive: true };
     this.answerChart.chartLegend = true;
-    const answerCount: number[] = []
     this.surveyItems.forEach((surveyItem) => {
       this.answerChart.chartLabels.push(surveyItem.text);
-      if (this.answers) {
-        answerCount.push(this.answers.filter(answer => answer.surveyItemId === surveyItem.id).length);
-      }
     });
-    const answerChartData: ChartDataset[] = [{ data: answerCount }];
-    this.answerChart.chartDatasets = answerChartData;
+    this.updateChartDataset();
   }
 
   updateChartDataset() {

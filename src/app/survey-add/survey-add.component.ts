@@ -1,8 +1,10 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { ClrLoadingState } from '@clr/angular';
-import { SurveyInitialize } from '../interface/survey';
+
+import { Survey } from '../class/survey';
+import { SurveyItem } from '../class/survey-item';
+
 import { SurveyService } from '../service/survey.service';
-import { SurveyItem, SurveyItemInitialize } from '../interface/survey-item';
 import { SurveyItemService } from '../service/survey-item.service';
 import { forkJoin, Observable, of } from 'rxjs';
 
@@ -16,7 +18,7 @@ export class SurveyAddComponent {
   @Input() addModalOpen?: Boolean;
 
   surveyItems: SurveyItem[] = [];
-  survey = new SurveyInitialize;
+  survey = new Survey;
   deleteSurveyItems: number[] = [];
   submitBtnState: ClrLoadingState = ClrLoadingState.DEFAULT;
 
@@ -26,7 +28,7 @@ export class SurveyAddComponent {
   ) { }
 
   onClose(): void {
-    this.addModalOpen = undefined;
+    this.addModalOpen = false;
     this.surveyItems = [];
     this.deleteSurveyItems = [];
     this.reloadSurveys.emit();
@@ -37,7 +39,6 @@ export class SurveyAddComponent {
     this.addSurvey().subscribe(survey => {
       this.addSurveyItem(survey.id).subscribe(() => {
         this.submitBtnState = ClrLoadingState.SUCCESS;
-        this.submitBtnState = ClrLoadingState.DEFAULT;
         this.onClose();
       });
     })
@@ -54,16 +55,11 @@ export class SurveyAddComponent {
     ) : of(null);
   }
 
-  addSurveyInitialize() {
-    this.survey.id = 0;
-    this.survey = new SurveyInitialize;
-  }
-
   addSurveyItemInitialize() {
-    this.surveyItems.push(new SurveyItemInitialize);
+    this.surveyItems.push(new SurveyItem);
   }
 
-  deleteSurveyItemList(index: number) {
+  deleteSurveyItem(index: number) {
     this.surveyItems.splice(index, 1);
   }
 }

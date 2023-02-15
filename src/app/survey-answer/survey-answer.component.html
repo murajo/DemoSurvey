@@ -1,6 +1,6 @@
-<div *ngFor="let item of survey;">
-    <h2 style="text-align: center;">{{item.title}}</h2>
-    <h3 style="text-align: center;">{{item.question}}</h3>
+<div *ngIf="survey;">
+    <h2 style="text-align: center;">{{survey.title}}</h2>
+    <h3 style="text-align: center;">{{survey.question}}</h3>
 </div>
 
 <div *ngIf="surveyItems">

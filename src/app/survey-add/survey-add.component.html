@@ -23,7 +23,7 @@
                         </clr-textarea-container>
                         <clr-input-container *ngFor="let surveyItem of surveyItems;let i = index">
                             <label style="font-size:110%;">選択肢{{i+1}}
-                                <cds-icon shape="trash" style="color:red;" (click)="deleteSurveyItemList(i)"></cds-icon>
+                                <cds-icon shape="trash" style="color:red;" (click)="deleteSurveyItem(i)"></cds-icon>
                             </label>
                             <input clrInput type="text" [(ngModel)]="surveyItem.text" required name="surveyItem{{i+1}}">
                             <clr-control-error>入力必須</clr-control-error>
