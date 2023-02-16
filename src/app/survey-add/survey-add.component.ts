@@ -29,6 +29,7 @@ export class SurveyAddComponent {
 
   onClose(): void {
     this.addModalOpen = false;
+    this.survey = new Survey;
     this.surveyItems = [];
     this.deleteSurveyItems = [];
     this.reloadSurveys.emit();
